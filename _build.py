@@ -6,7 +6,7 @@ import argparse
 import subprocess
 
 OUT_PATH = "bin/"
-EXCLUDES = ["bin", ".vscode"]
+RECURSIVE_EXCLUDES = ["bin", ".vscode"]
 
 def main():
     parser = argparse.ArgumentParser()
@@ -20,15 +20,25 @@ def main():
     else:
         # build specified targets
         for target in args.targets:
-            build(target, args.debug)
+            p = pathlib.Path(target)
+            if p.is_dir():
+                build_recursive(target, args.debug)
+            else:
+                build(target, args.debug)
 
 def build_all(debug : bool):
-    for d in pathlib.Path(".").iterdir():
-        if d.name in EXCLUDES:
+    build_recursive(".", debug)
+
+def build_recursive(path : str, debug : bool):
+    print(f"build recursive from root {path}")
+    for e in pathlib.Path(path).iterdir():
+        if e.name in RECURSIVE_EXCLUDES:
             continue
 
-        for f in d.glob("*.cpp"):
-            build(str(f), debug)
+        if e.is_dir():
+            build_recursive(str(e), debug)
+        elif e.name.endswith(".cpp"):
+            build(str(e), debug) 
 
 def build(path : str, debug : bool):
     target_name = name(path)
