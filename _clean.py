@@ -4,12 +4,14 @@
 import pathlib
 import argparse
 
+EXTENSIONS = ["*.exe", "*.obj", "*.pdb", "*.ilk"]
+
 def main():
     parser = argparse.ArgumentParser()
     parser.parse_args()
 
-    recursive_unlink("*.exe")
-    recursive_unlink("*.obj")
+    for ext in EXTENSIONS:
+        recursive_unlink(ext)
 
 def recursive_unlink(pattern : str):
     for f in pathlib.Path(".").rglob(pattern):
