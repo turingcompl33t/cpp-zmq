@@ -8,25 +8,30 @@
 
 #include <zmq.hpp>
 
-int main ()
+int main()
 {
+    // initialize the zmq context with a single IO thread
     zmq::context_t context{1};
-    zmq::socket_t socket{context, ZMQ_REQ};
 
-    std::cout << "Connecting to hello world server..." << std::endl;
+    // construct a REQ (request) socket and connect to interface
+    zmq::socket_t socket{context, ZMQ_REQ};
     socket.connect("tcp://localhost:5555");
 
-    for (auto request_nbr = 0; request_nbr < 10; ++request_nbr) 
+    for (auto request_num = 0; request_num < 10; ++request_num) 
     {
+        // initialize a request message
         zmq::message_t request{5};
         memcpy(request.data(), "Hello", 5);
         
-        std::cout << "Sending Hello " << request_nbr << "..." << std::endl;
+        // send the request message
+        std::cout << "Sending Hello " << request_num << "..." << std::endl;
         socket.send(request, zmq::send_flags::none);
         
+        // wait for reply from server
         zmq::message_t reply{};
         socket.recv(reply, zmq::recv_flags::none);
-        std::cout << "Received World " << request_nbr << std::endl;
+
+        std::cout << "Received World " << request_num << std::endl;
     }
 
     return 0;
