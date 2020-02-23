@@ -1,7 +1,6 @@
-// hwclient.cpp
-// Hello World client in C++; demonstrates basic request-reply pattern
-// Connects REQ socket to tcp://localhost:5555
-// Sends "Hello" to server, expects "World" back
+// client.cpp
+// Extension of simple request/reply server that supports
+// an intermediary broker.
 
 #include <string>
 #include <iostream>
@@ -17,7 +16,6 @@ int main()
     zmq::socket_t socket{context, ZMQ_REQ};
     socket.connect("tcp://localhost:5555");
 
-    // set up some static data to send
     const std::string data{"Hello"};
 
     for (auto request_num = 0; request_num < 10; ++request_num) 
@@ -26,15 +24,13 @@ int main()
         zmq::message_t request{data.cbegin(), data.cend()};
         
         // send the request message
-        std::cout << "Sending Hello " << request_num << "..." << std::endl;
         socket.send(request, zmq::send_flags::none);
         
         // wait for reply from server
         zmq::message_t reply{};
         socket.recv(reply, zmq::recv_flags::none);
 
-        std::cout << "Received " << reply.to_string(); 
-        std::cout << " (" << request_num << ")";
+        std::cout << "Received " << reply.to_string();
         std::cout << std::endl;
     }
 

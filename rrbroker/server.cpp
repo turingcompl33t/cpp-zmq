@@ -1,7 +1,6 @@
-// hwserver.cpp
-// Hello World server in C++; demonstrates basic request-reply pattern
-// Binds REP socket to tcp://*:5555
-// Expects "Hello" from client, replies with "World"
+// server.cpp
+// Extension of simple request/reply server that supports
+// an intermediary broker.
 
 #include <string>
 #include <chrono>
@@ -19,9 +18,8 @@ int main()
 
     // construct a REP (reply) socket and bind to interface
     zmq::socket_t socket{context, ZMQ_REP};
-    socket.bind("tcp://*:5555");
+    socket.connect("tcp://127.0.0.1:5556");
 
-    // prepare some static data for responses
     const std::string data{"World"};
 
     for (;;) 
